@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meteo-Dani O_o</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <h1>Meteo-Dani O_o</h1>
+
+    <div class="search-bar">
+        <input type="text" id="city-input" placeholder="City... NOW!!!" />
+        <button id="search-button">Find out the weather!</button>
+    </div>
+
+    <p id="error-msg"></p>
+
+    <div id="weather-card">
+        <h2 id="city-name"></h2>
+        <p id="date"></p>
+        <div class="temp-row">
+            <span id="weather-icon"></span>
+            <span id="temperature"></span>
+        </div>
+        <p id="condition"></p>
+        <div class="stats">
+            <div><span class="label">Humidity</span><span id="humidity"></span></div>
+            <div><span class="label">Wind</span><span id="wind"></span></div>
+            <div><span id="label">Feels like</span><span id="feels-like"></span></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+</body>
+</html>
