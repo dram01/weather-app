@@ -21,22 +21,24 @@ async function searchWeather() {
         const geoData = await geoRes.json();
 
         if (!geoData.results || geoData.results.length === 0) {
-            errorMsg.textContent = `City "${city}" not found.  Try again.`;
+            errorMsg.textContent = `City "${city}" not found. Try again.`;
             return;
         }
 
-            const { latitude, longitude, name, country } = geoData.results[0];
-            
-            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto`;
-            const weatherRes = await fetch(weatherUrl);
-            const weatherData = await weatherRes.json();
+        const { latitude, longitude, name, country } = geoData.results[0];
 
-            renderWeather(name, country, weatherData, weatherData.timezone);
+        // ✅ daily parameters added here
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto`;
+        const weatherRes = await fetch(weatherUrl);
+        const weatherData = await weatherRes.json();
+
+        renderWeather(name, country, weatherData, weatherData.timezone);
+
     } catch (err) {
         errorMsg.textContent = 'Something went wrong. Check your connection';
         console.error(err);
     }
-};
+}
 
 function renderWeather(name, country, data, timezone) {
     const c = data.current;
@@ -47,17 +49,13 @@ function renderWeather(name, country, data, timezone) {
         minute: '2-digit'
     });
 
-    
-
     const localDate = new Date().toLocaleDateString('en-GB', {
-    timeZone: timezone,
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+        timeZone: timezone,
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     });
-
-    console.log(localDate, localTime);
 
     document.getElementById('city-name').textContent = `${name}, ${country}`;
     document.getElementById('date').textContent = `${localDate} · 🕐 ${localTime}`;
@@ -69,10 +67,26 @@ function renderWeather(name, country, data, timezone) {
     document.getElementById('feels-like').textContent = `${Math.round(c.apparent_temperature)}°C`;
 
     document.getElementById('weather-card').style.display = 'block';
+
+    // ✅ forecast code goes here, inside renderWeather
+    const forecastEl = document.getElementById('forecast');
+    forecastEl.innerHTML = '';
+
+    for (let i = 0; i < 5; i++) {
+        const day = document.createElement('div');
+        day.className = 'forecast-day';
+        day.innerHTML = `
+            <div class="fc-day">${shortDay(data.daily.time[i])}</div>
+            <div class="fc-icon">${getIcon(data.daily.weather_code[i])}</div>
+            <div class="fc-hi">${Math.round(data.daily.temperature_2m_max[i])}°C</div>
+            <div class="fc-lo">${Math.round(data.daily.temperature_2m_min[i])}°C</div>
+        `;
+        forecastEl.appendChild(day);
+    }
 }
 
 function getIcon(code) {
-    if (code === 0) return '☀️'; // numbers mean the a wether code. example 0 means clear sky, 1, 2 or 3 is partly cloudy, anything from 4 to 48 is a fog code, 49 to 55 is small rain, sort of a drizzle
+    if (code === 0) return '☀️';
     if (code <= 3) return '⛅';
     if (code <= 48) return '🌫️';
     if (code <= 55) return '🌦️';
@@ -91,7 +105,8 @@ function getCondition(code) {
     if (code <= 77) return 'Snow';
     if (code <= 82) return 'Rain showers';
     return 'Thunderstorm';
-};
+}
 
-
-
+function shortDay(dateStr) {
+    return new Date(dateStr).toLocaleDateString('en-GB', { weekday: 'short' });
+}
