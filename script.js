@@ -31,18 +31,36 @@ async function searchWeather() {
             const weatherRes = await fetch(weatherUrl);
             const weatherData = await weatherRes.json();
 
-            renderWeather(name, country, weatherData);
+            renderWeather(name, country, weatherData, weatherData.timezone);
     } catch (err) {
         errorMsg.textContent = 'Something went wrong. Check your connection';
         console.error(err);
     }
 };
 
-function renderWeather(name, country, data) {
+function renderWeather(name, country, data, timezone) {
     const c = data.current;
 
+    const localTime = new Date().toLocaleTimeString('en-GB', {
+        timeZone: timezone,
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    
+
+    const localDate = new Date().toLocaleDateString('en-GB', {
+    timeZone: timezone,
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+    });
+
+    console.log(localDate, localTime);
+
     document.getElementById('city-name').textContent = `${name}, ${country}`;
-    document.getElementById('date').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('date').textContent = `${localDate} · 🕐 ${localTime}`;
     document.getElementById('temperature').textContent = `${Math.round(c.temperature_2m)}°C`;
     document.getElementById('weather-icon').textContent = getIcon(c.weather_code);
     document.getElementById('condition').textContent = getCondition(c.weather_code);
@@ -60,7 +78,7 @@ function getIcon(code) {
     if (code <= 55) return '🌦️';
     if (code <= 65) return '🌧️';
     if (code <= 77) return '❄️';
-    if (code <= 82) return '';
+    if (code <= 82) return '🌧️';
     return '❄️';
 }
 
@@ -73,5 +91,7 @@ function getCondition(code) {
     if (code <= 77) return 'Snow';
     if (code <= 82) return 'Rain showers';
     return 'Thunderstorm';
-}
+};
+
+
 
