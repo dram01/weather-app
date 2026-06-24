@@ -54,7 +54,7 @@ function renderWeather(name, country, data) {
 }
 
 function getIcon(code) {
-    if (code === 0) return '☀️';
+    if (code === 0) return '☀️'; // numbers mean the a wether code. example 0 means clear sky, 1, 2 or 3 is partly cloudy, anything from 4 to 48 is a fog code, 49 to 55 is small rain, sort of a drizzle
     if (code <= 3) return '⛅';
     if (code <= 48) return '🌫️';
     if (code <= 55) return '🌦️';
